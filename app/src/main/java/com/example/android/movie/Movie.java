@@ -12,7 +12,17 @@ import java.util.List;
 public class Movie implements Parcelable {
 
     public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w342";
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
 
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
@@ -59,6 +69,24 @@ public class Movie implements Parcelable {
     public Movie() {
     }
 
+    protected Movie(Parcel in) {
+        this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.id = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.voteAverage = (Double) in.readValue(Double.class.getClassLoader());
+        this.title = in.readString();
+        this.popularity = (Double) in.readValue(Double.class.getClassLoader());
+        this.poster = in.readString();
+        this.originalLanguage = in.readString();
+        this.originalTitle = in.readString();
+        this.genreIds = new ArrayList<Integer>();
+        in.readList(this.genreIds, Integer.class.getClassLoader());
+        this.backdrop = in.readString();
+        this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.description = in.readString();
+        this.releaseDate = in.readString();
+    }
+
     public String getTitle() {
         return title;
     }
@@ -90,7 +118,6 @@ public class Movie implements Parcelable {
     public void setBackdrop(String backdrop) {
         this.backdrop = backdrop;
     }
-
 
     public Integer getVoteCount() {
         return voteCount;
@@ -172,14 +199,6 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-    public static class MovieResult {
-        private List<Movie> results;
-
-        public List<Movie> getResults() {
-            return results;
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -203,33 +222,11 @@ public class Movie implements Parcelable {
         dest.writeString(this.releaseDate);
     }
 
-    protected Movie(Parcel in) {
-        this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.id = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.voteAverage = (Double) in.readValue(Double.class.getClassLoader());
-        this.title = in.readString();
-        this.popularity = (Double) in.readValue(Double.class.getClassLoader());
-        this.poster = in.readString();
-        this.originalLanguage = in.readString();
-        this.originalTitle = in.readString();
-        this.genreIds = new ArrayList<Integer>();
-        in.readList(this.genreIds, Integer.class.getClassLoader());
-        this.backdrop = in.readString();
-        this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.description = in.readString();
-        this.releaseDate = in.readString();
+    public static class MovieResult {
+        private List<Movie> results;
+
+        public List<Movie> getResults() {
+            return results;
+        }
     }
-
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel source) {
-            return new Movie(source);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
 }

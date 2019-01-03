@@ -7,7 +7,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mRecyclerView.setHasFixedSize(true);
         mAdapter = new MoviesAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
         List<Movie> movies = new ArrayList<>();
@@ -115,9 +115,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
     @Override
     public void onMovieSelected(Movie movie) {
-        Toast.makeText(MainActivity.this, movie.getTitle(), Toast.LENGTH_SHORT).show();
         Intent intentToStartMovieDetail = new Intent(this, MovieDetails.class);
-        intentToStartMovieDetail.putExtra("myDataKey", movie);
+        intentToStartMovieDetail.putExtra(MovieDetails.MOVIE_OBJECT, movie);
         startActivity(intentToStartMovieDetail);
     }
 }

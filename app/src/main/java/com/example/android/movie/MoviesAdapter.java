@@ -6,18 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
 
+    final private ItemClickListener mItemClickListener;
     private List<Movie> mMovieList;
     private LayoutInflater mInflater;
     private Context mContext;
-    final private ItemClickListener mItemClickListener;
 
     public MoviesAdapter(Context context, ItemClickListener listener) {
         this.mContext = context;
@@ -39,7 +37,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         Movie movie = mMovieList.get(position);
         Picasso.with(mContext)
                 .load(movie.getPoster())
-                .placeholder(R.color.colorAccent)
+                .placeholder(R.drawable.ic_movie_poster)
+                .fit()
                 .into(holder.imageView);
     }
 
@@ -48,14 +47,14 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         return (mMovieList == null) ? 0 : mMovieList.size();
     }
 
-    public interface ItemClickListener {
-        void onMovieSelected(Movie movie);
-    }
-
     public void setMovieList(List<Movie> movieList) {
         this.mMovieList.clear();
         this.mMovieList.addAll(movieList);
         notifyDataSetChanged();
+    }
+
+    public interface ItemClickListener {
+        void onMovieSelected(Movie movie);
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

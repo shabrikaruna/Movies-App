@@ -1,17 +1,39 @@
 package com.example.android.movie;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 public class MovieDetails extends AppCompatActivity {
+
+    public static final String MOVIE_OBJECT = "movie_object";
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
-        Movie object = (Movie) getIntent().getParcelableExtra("myDataKey");
-        Toast.makeText(MovieDetails.this,object.getTitle(),Toast.LENGTH_SHORT).show();
+        ImageView mImageViewBackdrop = findViewById(R.id.image_view_backdrop);
+        TextView mTextViewTitle = findViewById(R.id.text_view_title);
+        TextView mTextViewRating = findViewById(R.id.text_view_rating);
+        TextView mTextViewPlot = findViewById(R.id.text_view_plot);
+
+        Movie movieObject = getIntent().getParcelableExtra(MOVIE_OBJECT);
+        Picasso.with(mContext)
+                .load(movieObject.getBackdrop())
+                .placeholder(R.drawable.ic_movie_poster_landscape)
+                .fit()
+                .into(mImageViewBackdrop);
+        mTextViewTitle.setText(movieObject.getTitle());
+        Double rating = movieObject.getVoteAverage();
+        String ratingString = Double.toString(rating);
+        ratingString += " / 10";
+        mTextViewRating.setText(ratingString);
+        mTextViewPlot.setText(movieObject.getDescription());
     }
 }
