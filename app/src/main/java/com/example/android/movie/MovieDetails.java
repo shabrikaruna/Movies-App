@@ -22,13 +22,14 @@ public class MovieDetails extends AppCompatActivity {
         TextView mTextViewTitle = findViewById(R.id.text_view_title);
         TextView mTextViewRating = findViewById(R.id.text_view_rating);
         TextView mTextViewPlot = findViewById(R.id.text_view_plot);
-
         Movie movieObject = getIntent().getParcelableExtra(MOVIE_OBJECT);
+
         Picasso.with(mContext)
                 .load(movieObject.getBackdrop())
                 .placeholder(R.drawable.ic_movie_poster_landscape)
                 .fit()
                 .into(mImageViewBackdrop);
+
         mTextViewTitle.setText(movieObject.getTitle());
         Double rating = movieObject.getVoteAverage();
         String ratingString = Double.toString(rating);

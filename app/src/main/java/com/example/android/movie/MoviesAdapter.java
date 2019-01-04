@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         return viewHolder;
     }
 
+    public void clearData(){
+        mMovieList.clear();
+        notifyDataSetChanged();
+    }
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
@@ -48,9 +54,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     }
 
     public void setMovieList(List<Movie> movieList) {
-        this.mMovieList.clear();
-        this.mMovieList.addAll(movieList);
-        notifyDataSetChanged();
+        if (mMovieList == null) {
+            mMovieList = movieList;
+            notifyDataSetChanged();
+        } else {
+            mMovieList.addAll(movieList);
+            notifyItemRangeInserted(mMovieList.size() - movieList.size(), mMovieList.size());
+        }
     }
 
     public interface ItemClickListener {
