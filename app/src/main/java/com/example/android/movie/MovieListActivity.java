@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,16 +24,16 @@ import retrofit2.Call;
 
 public class MovieListActivity extends AppCompatActivity {
 
-    private boolean mTwoPane;
+    public final static String MOVIE_KEY = "movie_key";
+    public final static String MOVIE_KEY_INTENT = "movie_key_intent";
     private static final int NUMBER_OF_COLUMNS = 2;
+    private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
+    private static ProgressBar progressBar;
+    GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
+    private boolean mTwoPane;
     private SimpleItemRecyclerViewAdapter mAdapter;
     private int id = R.id.popular;
     private int page = 1;
-    public final static String MOVIE_KEY = "movie_key";
-    public final static String MOVIE_KEY_INTENT = "movie_key_intent";
-    private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
-    private EndlessRecyclerViewScrollListener scrollListener;
-    GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
     private RecyclerView recyclerView;
 
     @Override
@@ -40,9 +41,11 @@ public class MovieListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        progressBar = findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.VISIBLE);
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
@@ -53,7 +56,7 @@ public class MovieListActivity extends AppCompatActivity {
         setupRecyclerView((RecyclerView) recyclerView);
         getMovies();
 
-        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+        EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 getMovies();
@@ -78,6 +81,7 @@ public class MovieListActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                     List<Movie> list = response.body().getResults();
+                    progressBar.setVisibility(View.INVISIBLE);
                     mAdapter.setMovieList(list);
                 }
 
@@ -93,6 +97,7 @@ public class MovieListActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                     List<Movie> list = response.body().getResults();
+                    progressBar.setVisibility(View.INVISIBLE);
                     mAdapter.setMovieList(list);
                 }
 
@@ -117,11 +122,13 @@ public class MovieListActivity extends AppCompatActivity {
             case R.id.toprated:
                 page = 1;
                 getMovies();
+                progressBar.setVisibility(View.VISIBLE);
                 mAdapter.clearData();
                 return true;
             case R.id.popular:
                 page = 1;
                 getMovies();
+                progressBar.setVisibility(View.VISIBLE);
                 mAdapter.clearData();
                 return true;
             default:
@@ -131,20 +138,20 @@ public class MovieListActivity extends AppCompatActivity {
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-        private List<Movie> mMovieList;
-        private LayoutInflater mInflater;
         private final MovieListActivity mParentActivity;
         private final boolean mTwoPane;
+        private List<Movie> mMovieList;
+        private LayoutInflater mInflater;
 
-
-        public void clearData() {
-            mMovieList.clear();
-            notifyDataSetChanged();
-        }
 
         SimpleItemRecyclerViewAdapter(MovieListActivity parent, boolean twoPane) {
             mParentActivity = parent;
             mTwoPane = twoPane;
+        }
+
+        public void clearData() {
+            mMovieList.clear();
+            notifyDataSetChanged();
         }
 
         @Override
@@ -210,7 +217,7 @@ public class MovieListActivity extends AppCompatActivity {
 
             ViewHolder(View view) {
                 super(view);
-                imageView = (ImageView) itemView.findViewById(R.id.imageView);
+                imageView = itemView.findViewById(R.id.imageView);
             }
 
         }

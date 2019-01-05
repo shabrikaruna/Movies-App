@@ -3,8 +3,12 @@
     <string name="top_rated">Top Rated</string>
     <string name="popular">Popular</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_movie_list">MoviesNew</string>
     <string name="title_movie_detail">Movie Detail</string>
+    <string name="votes">Votes %d</string>
+    <string name="releasedate">Release Date </string>
+    <string name="releaseDate">Release Date </string>
+    <string name="Votes">Votes</string>
+    <string name="rating">Rating</string>
 </resources>

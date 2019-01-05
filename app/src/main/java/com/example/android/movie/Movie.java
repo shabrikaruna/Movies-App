@@ -11,7 +11,8 @@ import java.util.List;
 
 public class Movie implements Parcelable {
 
-    public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w342";
+    public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
+    public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {
@@ -112,7 +113,7 @@ public class Movie implements Parcelable {
     }
 
     public String getBackdrop() {
-        return TMDB_IMAGE_PATH + backdrop;
+        return TMDB_IMAGE_PATH_BACKDROP + backdrop;
     }
 
     public void setBackdrop(String backdrop) {

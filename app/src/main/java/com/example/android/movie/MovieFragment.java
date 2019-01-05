@@ -50,10 +50,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.ItemClickLi
 
         progressBar.setVisibility(View.VISIBLE);
         progressBar_Bottom.setVisibility(View.INVISIBLE);
-
-
         setHasOptionsMenu(true);
-
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
