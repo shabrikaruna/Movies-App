@@ -42,7 +42,6 @@ public class MovieDetailFragment extends Fragment {
         TextView mTextViewVotes = rootView.findViewById(R.id.text_view_votes);
         TextView mTextViewReleaseDate = rootView.findViewById(R.id.text_view_release_date);
 
-
         Picasso.with(activity)
                 .load(mMovie.getPoster())
                 .fit()

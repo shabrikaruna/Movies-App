@@ -1,5 +1,9 @@
 package com.example.android.movie;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,6 +13,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
     public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
@@ -29,6 +34,7 @@ public class Movie implements Parcelable {
     private Integer voteCount;
     @SerializedName("id")
     @Expose
+    @PrimaryKey
     private Integer id;
     @SerializedName("video")
     @Expose
@@ -53,6 +59,7 @@ public class Movie implements Parcelable {
     private String originalTitle;
     @SerializedName("genre_ids")
     @Expose
+    @Ignore
     private List<Integer> genreIds = null;
     @SerializedName("backdrop_path")
     @Expose
@@ -68,6 +75,23 @@ public class Movie implements Parcelable {
     private String releaseDate;
 
     public Movie() {
+    }
+
+    public Movie(Integer voteCount, Integer id, Boolean video, Double voteAverage, String title, Double popularity, String poster, String originalLanguage, String originalTitle, List<Integer> genreIds, String backdrop, Boolean adult, String description, String releaseDate) {
+        this.voteCount = voteCount;
+        this.id = id;
+        this.video = video;
+        this.voteAverage = voteAverage;
+        this.title = title;
+        this.popularity = popularity;
+        this.poster = poster;
+        this.originalLanguage = originalLanguage;
+        this.originalTitle = originalTitle;
+        this.genreIds = genreIds;
+        this.backdrop = backdrop;
+        this.adult = adult;
+        this.description = description;
+        this.releaseDate = releaseDate;
     }
 
     protected Movie(Parcel in) {
@@ -176,13 +200,13 @@ public class Movie implements Parcelable {
         this.originalTitle = originalTitle;
     }
 
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
+//    public List<Integer> getGenreIds() {
+//        return genreIds;
+//    }
+//
+//    public void setGenreIds(List<Integer> genreIds) {
+//        this.genreIds = genreIds;
+//    }
 
     public Boolean getAdult() {
         return adult;
@@ -216,7 +240,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.poster);
         dest.writeString(this.originalLanguage);
         dest.writeString(this.originalTitle);
-        dest.writeList(this.genreIds);
+//        dest.writeList(this.genreIds);
         dest.writeString(this.backdrop);
         dest.writeValue(this.adult);
         dest.writeString(this.description);

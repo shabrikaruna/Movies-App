@@ -2,7 +2,6 @@ package com.example.android.movie;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiInterface {
@@ -10,8 +9,5 @@ public interface ApiInterface {
     Call<MoviesResponse> getTopRatedMovies(@Query("api_key") String apiKey, @Query("page") int pages);
 
     @GET("movie/popular")
-    Call<MoviesResponse> getPopularMovies(@Query("api_key") String apiKey , @Query("page") int pages);
-
-    @GET("movie/{id}")
-    Call<MoviesResponse> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<MoviesResponse> getPopularMovies(@Query("api_key") String apiKey, @Query("page") int pages);
 }

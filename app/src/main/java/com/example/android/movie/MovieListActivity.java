@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.example.android.movie.database.AppDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class MovieListActivity extends AppCompatActivity {
     private int page = 1;
     private RecyclerView recyclerView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +48,7 @@ public class MovieListActivity extends AppCompatActivity {
         toolbar.setTitle(getTitle());
         progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
+        getSupportActionBar().setTitle(R.string.popular);
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
@@ -123,12 +126,14 @@ public class MovieListActivity extends AppCompatActivity {
                 page = 1;
                 getMovies();
                 progressBar.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle(R.string.top_rated);
                 mAdapter.clearData();
                 return true;
             case R.id.popular:
                 page = 1;
                 getMovies();
                 progressBar.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle(R.string.popular);
                 mAdapter.clearData();
                 return true;
             default:

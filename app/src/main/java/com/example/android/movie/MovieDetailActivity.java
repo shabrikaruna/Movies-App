@@ -2,18 +2,26 @@ package com.example.android.movie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.example.android.movie.database.AppDatabase;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
     Movie mMovie;
+    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +54,23 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
 
+            final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
 
+            mDb = AppDatabase.getInstance(getApplicationContext());
+
+            myFab.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.movieDao().insertMovie(mMovie);
+                            finish();
+                        }
+                    });
+                    Toast.makeText(MovieDetailActivity.this,"Inserted Data",Toast.LENGTH_SHORT).show();
+                    myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
+                }
+            });
         }
     }
 
