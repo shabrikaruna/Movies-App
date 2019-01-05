@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import retrofit2.Call;
 public class MovieListActivity extends AppCompatActivity {
 
     public final static String MOVIE_KEY = "movie_key";
+    private static final String TAG = "MovieListActivity";
     public final static String MOVIE_KEY_INTENT = "movie_key_intent";
     private static final int NUMBER_OF_COLUMNS = 2;
     private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
@@ -36,7 +38,9 @@ public class MovieListActivity extends AppCompatActivity {
     private int id = R.id.popular;
     private int page = 1;
     private RecyclerView recyclerView;
-
+    private AppDatabase mDb;
+    public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
+    public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,8 @@ public class MovieListActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
         getSupportActionBar().setTitle(R.string.popular);
+
+        mDb = AppDatabase.getInstance(this.getApplication());
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
@@ -118,6 +124,12 @@ public class MovieListActivity extends AppCompatActivity {
         return true;
     }
 
+
+    public void getFavoriteMovies() {
+        List<Movie> favorites = mDb.movieDao().getfavourites();
+        mAdapter.setMovieList(favorites);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         id = item.getItemId();
@@ -135,6 +147,11 @@ public class MovieListActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.popular);
                 mAdapter.clearData();
+                return true;
+            case R.id.favorites:
+                mAdapter.clearData();
+                getSupportActionBar().setTitle(R.string.favorites);
+                getFavoriteMovies();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -170,12 +187,12 @@ public class MovieListActivity extends AppCompatActivity {
         public void onBindViewHolder(final ViewHolder holder, final int position) {
 
             Movie movie = mMovieList.get(position);
+
             Picasso.with(mParentActivity)
-                    .load(movie.getPoster())
+                    .load(TMDB_IMAGE_PATH + movie.getPoster())
                     .placeholder(R.drawable.ic_movie_poster_new_1)
                     .fit()
                     .into(holder.imageView);
-
 
             final View.OnClickListener mOnClickListener = new View.OnClickListener() {
                 @Override

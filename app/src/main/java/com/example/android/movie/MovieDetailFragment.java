@@ -43,7 +43,7 @@ public class MovieDetailFragment extends Fragment {
         TextView mTextViewReleaseDate = rootView.findViewById(R.id.text_view_release_date);
 
         Picasso.with(activity)
-                .load(mMovie.getPoster())
+                .load(MovieListActivity.TMDB_IMAGE_PATH + mMovie.getPoster())
                 .fit()
                 .into(mImageViewPoster);
 

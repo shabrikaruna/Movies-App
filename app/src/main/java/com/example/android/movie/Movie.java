@@ -16,8 +16,6 @@ import java.util.List;
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
-    public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
-    public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {
@@ -87,7 +85,7 @@ public class Movie implements Parcelable {
         this.poster = poster;
         this.originalLanguage = originalLanguage;
         this.originalTitle = originalTitle;
-        this.genreIds = genreIds;
+//        this.genreIds = genreIds;
         this.backdrop = backdrop;
         this.adult = adult;
         this.description = description;
@@ -104,8 +102,8 @@ public class Movie implements Parcelable {
         this.poster = in.readString();
         this.originalLanguage = in.readString();
         this.originalTitle = in.readString();
-        this.genreIds = new ArrayList<Integer>();
-        in.readList(this.genreIds, Integer.class.getClassLoader());
+//        this.genreIds = new ArrayList<Integer>();
+//        in.readList(this.genreIds, Integer.class.getClassLoader());
         this.backdrop = in.readString();
         this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.description = in.readString();
@@ -121,7 +119,7 @@ public class Movie implements Parcelable {
     }
 
     public String getPoster() {
-        return TMDB_IMAGE_PATH + poster;
+        return poster;
     }
 
     public void setPoster(String poster) {
@@ -137,7 +135,7 @@ public class Movie implements Parcelable {
     }
 
     public String getBackdrop() {
-        return TMDB_IMAGE_PATH_BACKDROP + backdrop;
+        return backdrop;
     }
 
     public void setBackdrop(String backdrop) {

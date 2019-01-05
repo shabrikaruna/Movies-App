@@ -11,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.android.movie.database.AppDatabase;
 import com.squareup.picasso.Picasso;
@@ -29,8 +28,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
+        mDb = AppDatabase.getInstance(getApplicationContext());
+        final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
+        List<Movie> fabButtonToRed = mDb.movieDao().getfavourites();
         ActionBar actionBar = getSupportActionBar();
+
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -43,7 +45,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             mMovie = arguments.getParcelable(MovieListActivity.MOVIE_KEY);
 
             Picasso.with(MovieDetailActivity.this)
-                    .load(mMovie.getBackdrop())
+                    .load(MovieListActivity.TMDB_IMAGE_PATH_BACKDROP + mMovie.getBackdrop())
                     .placeholder(R.drawable.ic_movie_poster_landscape)
                     .fit()
                     .into(imageView);
@@ -54,9 +56,12 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
 
-            final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
 
-            mDb = AppDatabase.getInstance(getApplicationContext());
+            for (Movie movie : fabButtonToRed) {
+                if (movie.getId().equals(mMovie.getId())) {
+                    myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
+                }
+            }
 
             myFab.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -64,10 +69,8 @@ public class MovieDetailActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mDb.movieDao().insertMovie(mMovie);
-                            finish();
                         }
                     });
-                    Toast.makeText(MovieDetailActivity.this,"Inserted Data",Toast.LENGTH_SHORT).show();
                     myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
                 }
             });
