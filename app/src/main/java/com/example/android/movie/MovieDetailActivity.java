@@ -21,12 +21,14 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     Movie mMovie;
     private AppDatabase mDb;
+    private static final int IS_ID_PRESENT_IN_DATABASE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+
+        Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
         mDb = AppDatabase.getInstance(getApplicationContext());
         final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -43,7 +45,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             ImageView imageView = findViewById(R.id.image_view_backdrop);
             mMovie = arguments.getParcelable(MovieListActivity.MOVIE_KEY);
-
             Picasso.with(MovieDetailActivity.this)
                     .load(MovieListActivity.TMDB_IMAGE_PATH_BACKDROP + mMovie.getBackdrop())
                     .placeholder(R.drawable.ic_movie_poster_landscape)
@@ -56,19 +57,21 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
 
-
             for (Movie movie : fabButtonToRed) {
                 if (movie.getId().equals(mMovie.getId())) {
                     myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
                 }
             }
-
+            getSupportActionBar().setTitle(mMovie.getTitle());
             myFab.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            mDb.movieDao().insertMovie(mMovie);
+                            int checkForFavouritesInDatabase = mDb.movieDao().loadAllFavourites(mMovie.getId());
+                            if (!(checkForFavouritesInDatabase == IS_ID_PRESENT_IN_DATABASE)) {
+                                mDb.movieDao().insertMovie(mMovie);
+                            }
                         }
                     });
                     myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));

@@ -30,5 +30,4 @@
         <include layout="@layout/movie_list" />
     </FrameLayout>
 
-
 </android.support.design.widget.CoordinatorLayout>

@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,20 +26,19 @@ import retrofit2.Call;
 public class MovieListActivity extends AppCompatActivity {
 
     public final static String MOVIE_KEY = "movie_key";
-    private static final String TAG = "MovieListActivity";
     public final static String MOVIE_KEY_INTENT = "movie_key_intent";
-    private static final int NUMBER_OF_COLUMNS = 2;
-    private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
-    private static ProgressBar progressBar;
-    GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
-    private boolean mTwoPane;
-    private SimpleItemRecyclerViewAdapter mAdapter;
-    private int id = R.id.popular;
-    private int page = 1;
-    private RecyclerView recyclerView;
-    private AppDatabase mDb;
     public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
     public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
+    private static final int NUMBER_OF_COLUMNS = 2;
+    private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
+    private static int id = R.id.popular;
+    GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
+    private ProgressBar progressBar;
+    private int page = 1;
+    private boolean mTwoPane;
+    private AppDatabase mDb;
+    private RecyclerView recyclerView;
+    private SimpleItemRecyclerViewAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +52,11 @@ public class MovieListActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         getSupportActionBar().setTitle(R.string.popular);
 
-        mDb = AppDatabase.getInstance(this.getApplication());
-
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
         }
 
+        mDb = AppDatabase.getInstance(this.getApplication());
         recyclerView = findViewById(R.id.movie_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
@@ -72,7 +69,6 @@ public class MovieListActivity extends AppCompatActivity {
             }
         };
         recyclerView.addOnScrollListener(scrollListener);
-
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -82,11 +78,11 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     public void getMovies() {
-
         if (id == R.id.popular) {
             ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
             Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, page++);
             call.enqueue(new retrofit2.Callback<MoviesResponse>() {
+
                 @Override
                 public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                     List<Movie> list = response.body().getResults();
@@ -123,7 +119,6 @@ public class MovieListActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.filteritems, menu);
         return true;
     }
-
 
     public void getFavoriteMovies() {
         List<Movie> favorites = mDb.movieDao().getfavourites();
@@ -176,18 +171,18 @@ public class MovieListActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
 
+        @NonNull
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.movie_list_content, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
 
             Movie movie = mMovieList.get(position);
-
             Picasso.with(mParentActivity)
                     .load(TMDB_IMAGE_PATH + movie.getPoster())
                     .placeholder(R.drawable.ic_movie_poster_new_1)
@@ -219,7 +214,7 @@ public class MovieListActivity extends AppCompatActivity {
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
-        public void setMovieList(List<Movie> movieList) {
+        void setMovieList(List<Movie> movieList) {
             if (mMovieList == null) {
                 mMovieList = movieList;
                 notifyDataSetChanged();

@@ -2,9 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MovieDetails">
-
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,18 +13,17 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="250dp"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:orientation="horizontal">
 
             <ImageView
-                android:padding="@dimen/padding_16dp"
                 android:id="@+id/image_view_poster"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:adjustViewBounds="true" />
+                android:adjustViewBounds="true"
+                android:padding="@dimen/padding_16dp" />
 
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -45,37 +42,37 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    tools:text="Title"
                     android:paddingLeft="@dimen/padding_8dp"
                     android:paddingTop="@dimen/padding_8dp"
                     android:paddingRight="@dimen/padding_8dp"
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/textsize_20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="Title" />
 
                 <TextView
                     android:id="@+id/text_view_rating"
-                    android:paddingLeft="@dimen/padding_8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:paddingLeft="@dimen/padding_8dp"
                     tools:text="Rating" />
 
                 <TextView
                     android:id="@+id/text_view_votes"
-                    android:paddingLeft="@dimen/padding_8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
+
+                    android:paddingLeft="@dimen/padding_8dp"
                     tools:text="Votes" />
 
                 <TextView
                     android:id="@+id/text_view_release_date"
-                    android:paddingLeft="@dimen/padding_8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:paddingLeft="@dimen/padding_8dp"
                     tools:text="Release Date" />
 
             </LinearLayout>

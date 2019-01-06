@@ -1,6 +1,5 @@
 package com.example.android.movie;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -10,7 +9,6 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "movie")
@@ -85,7 +83,6 @@ public class Movie implements Parcelable {
         this.poster = poster;
         this.originalLanguage = originalLanguage;
         this.originalTitle = originalTitle;
-//        this.genreIds = genreIds;
         this.backdrop = backdrop;
         this.adult = adult;
         this.description = description;
@@ -102,8 +99,6 @@ public class Movie implements Parcelable {
         this.poster = in.readString();
         this.originalLanguage = in.readString();
         this.originalTitle = in.readString();
-//        this.genreIds = new ArrayList<Integer>();
-//        in.readList(this.genreIds, Integer.class.getClassLoader());
         this.backdrop = in.readString();
         this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.description = in.readString();
@@ -198,14 +193,6 @@ public class Movie implements Parcelable {
         this.originalTitle = originalTitle;
     }
 
-//    public List<Integer> getGenreIds() {
-//        return genreIds;
-//    }
-//
-//    public void setGenreIds(List<Integer> genreIds) {
-//        this.genreIds = genreIds;
-//    }
-
     public Boolean getAdult() {
         return adult;
     }
@@ -238,18 +225,9 @@ public class Movie implements Parcelable {
         dest.writeString(this.poster);
         dest.writeString(this.originalLanguage);
         dest.writeString(this.originalTitle);
-//        dest.writeList(this.genreIds);
         dest.writeString(this.backdrop);
         dest.writeValue(this.adult);
         dest.writeString(this.description);
         dest.writeString(this.releaseDate);
-    }
-
-    public static class MovieResult {
-        private List<Movie> results;
-
-        public List<Movie> getResults() {
-            return results;
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.android.movie;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -24,17 +25,15 @@ public class MovieDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(MovieListActivity.MOVIE_KEY)) {
-
             Bundle arguments = getArguments();
             mMovie = arguments.getParcelable(MovieListActivity.MOVIE_KEY);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.movie_detail, container, false);
-
         ImageView mImageViewPoster = rootView.findViewById(R.id.image_view_poster);
         TextView mTextViewTitle = rootView.findViewById(R.id.text_view_title);
         TextView mTextViewRating = rootView.findViewById(R.id.text_view_rating);
@@ -47,10 +46,7 @@ public class MovieDetailFragment extends Fragment {
                 .fit()
                 .into(mImageViewPoster);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(mMovie.getTitle());
-
         mTextViewTitle.setText(mMovie.getTitle());
-        String title = mMovie.getTitle();
         Double rating = mMovie.getVoteAverage();
         String ratingString = Double.toString(rating);
         ratingString += " / 10";
