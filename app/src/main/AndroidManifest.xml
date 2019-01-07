@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.movie">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,16 +11,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="firebase_crash_collection_enabled"
             android:value="false" />
+
         <activity
             android:name=".MovieListActivity"
             android:label="@string/title_movie_list"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,7 +32,8 @@
             android:name=".MovieDetailActivity"
             android:label="@string/title_movie_detail"
             android:parentActivityName=".MovieListActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".YouTubeActivity"></activity>
     </application>
 
 </manifest>

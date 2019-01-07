@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,15 +31,18 @@ public class MovieListActivity extends AppCompatActivity {
     public static final String TMDB_IMAGE_PATH = "http://image.tmdb.org/t/p/w500";
     public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
     private static final int NUMBER_OF_COLUMNS = 2;
-    private final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
-    private static int id = R.id.popular;
-    GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
+    public final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
+    public static int id = R.id.popular;
+    private GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
     private ProgressBar progressBar;
     private int page = 1;
     private boolean mTwoPane;
     private AppDatabase mDb;
     private RecyclerView recyclerView;
     private SimpleItemRecyclerViewAdapter mAdapter;
+    private ImageView mNoInternetImageView;
+    private SwipeRefreshLayout refreshPage;
+    private boolean doNotChangeThePage = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,19 @@ public class MovieListActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
         getSupportActionBar().setTitle(R.string.popular);
+        mNoInternetImageView = findViewById(R.id.no_internet_image);
+
+        mNoInternetImageView.setVisibility(View.INVISIBLE);
+        refreshPage = findViewById(R.id.pullToRefresh);
+
+        refreshPage.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                page = 1;
+                getMovies();
+                refreshPage.setRefreshing(false);
+            }
+        });
 
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
@@ -78,40 +95,65 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     public void getMovies() {
-        if (id == R.id.popular) {
-            ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-            Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, page++);
-            call.enqueue(new retrofit2.Callback<MoviesResponse>() {
-
-                @Override
-                public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
-                    List<Movie> list = response.body().getResults();
-                    progressBar.setVisibility(View.INVISIBLE);
-                    mAdapter.setMovieList(list);
-                }
-
-                @Override
-                public void onFailure(Call<MoviesResponse> call, Throwable t) {
-
-                }
-            });
-        } else if (id == R.id.toprated) {
-            ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-            Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY, page++);
-            call.enqueue(new retrofit2.Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
-                    List<Movie> list = response.body().getResults();
-                    progressBar.setVisibility(View.INVISIBLE);
-                    mAdapter.setMovieList(list);
-                }
-
-                @Override
-                public void onFailure(Call<MoviesResponse> call, Throwable t) {
-
-                }
-            });
+        switch (id) {
+            case R.id.popular:
+                getPopularMovies();
+                break;
+            case R.id.toprated:
+                getTopRatedMovies();
+                break;
+            case R.id.favorites:
+                getFavouriteMovies();
+                break;
         }
+    }
+
+    private void getFavouriteMovies() {
+        mAdapter.clearData();
+        List<Movie> favorites = mDb.movieDao().getFavourites();
+        mAdapter.setMovieList(favorites);
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void getPopularMovies() {
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, page++);
+        call.enqueue(new retrofit2.Callback<MoviesResponse>() {
+
+            @Override
+            public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
+                List<Movie> list = response.body().getResults();
+                mNoInternetImageView.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                mAdapter.setMovieList(list);
+            }
+
+            @Override
+            public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                progressBar.setVisibility(View.INVISIBLE);
+                mNoInternetImageView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void getTopRatedMovies() {
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY, page++);
+        call.enqueue(new retrofit2.Callback<MoviesResponse>() {
+            @Override
+            public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
+                List<Movie> list = response.body().getResults();
+                mNoInternetImageView.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                mAdapter.setMovieList(list);
+            }
+
+            @Override
+            public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                progressBar.setVisibility(View.INVISIBLE);
+                mNoInternetImageView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
@@ -120,10 +162,6 @@ public class MovieListActivity extends AppCompatActivity {
         return true;
     }
 
-    public void getFavoriteMovies() {
-        List<Movie> favorites = mDb.movieDao().getfavourites();
-        mAdapter.setMovieList(favorites);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -145,15 +183,16 @@ public class MovieListActivity extends AppCompatActivity {
                 return true;
             case R.id.favorites:
                 mAdapter.clearData();
+                progressBar.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.favorites);
-                getFavoriteMovies();
+                getMovies();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public static class SimpleItemRecyclerViewAdapter
+    public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
         private final MovieListActivity mParentActivity;
         private final boolean mTwoPane;
@@ -167,8 +206,10 @@ public class MovieListActivity extends AppCompatActivity {
         }
 
         public void clearData() {
-            mMovieList.clear();
-            notifyDataSetChanged();
+            if (mMovieList != null) {
+                mMovieList.clear();
+                notifyDataSetChanged();
+            }
         }
 
         @NonNull
@@ -188,6 +229,26 @@ public class MovieListActivity extends AppCompatActivity {
                     .placeholder(R.drawable.ic_movie_poster_new_1)
                     .fit()
                     .into(holder.imageView);
+
+            if (mTwoPane && doNotChangeThePage) {
+                doNotChangeThePage = false;
+                movie = mMovieList.get(0);
+                Bundle arguments = new Bundle();
+                arguments.putParcelable(MOVIE_KEY, movie);
+                MovieDetailFragment fragment = new MovieDetailFragment();
+                fragment.setArguments(arguments);
+                mParentActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, fragment)
+                        .commit();
+            }
+
+            if (id == R.id.favorites) {
+                getSupportActionBar().setTitle(R.string.favorites);
+            } else if (MovieListActivity.id == R.id.popular) {
+                getSupportActionBar().setTitle(R.string.popular);
+            } else {
+                getSupportActionBar().setTitle(R.string.top_rated);
+            }
 
             final View.OnClickListener mOnClickListener = new View.OnClickListener() {
                 @Override

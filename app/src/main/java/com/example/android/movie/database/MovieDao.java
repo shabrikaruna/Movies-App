@@ -18,7 +18,7 @@ public interface MovieDao {
     void deleteMovie(Movie movie);
 
     @Query("SELECT * FROM movie")
-    List<Movie> getfavourites();
+    List<Movie> getFavourites();
 
     @Query("SELECT COUNT(*) FROM movie WHERE id = :id")
     int loadAllFavourites(int id);

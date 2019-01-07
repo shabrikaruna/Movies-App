@@ -14,17 +14,6 @@ import java.util.List;
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel source) {
-            return new Movie(source);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
@@ -88,6 +77,18 @@ public class Movie implements Parcelable {
         this.description = description;
         this.releaseDate = releaseDate;
     }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     protected Movie(Parcel in) {
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());

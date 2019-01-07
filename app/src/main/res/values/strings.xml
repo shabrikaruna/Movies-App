@@ -11,4 +11,5 @@
     <string name="Votes">Votes</string>
     <string name="rating">Rating</string>
     <string name="favorites">Favorites</string>
+    <string name="rating_string">/ 10</string>
 </resources>

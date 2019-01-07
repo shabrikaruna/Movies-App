@@ -10,18 +10,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.android.movie.database.AppDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
     Movie mMovie;
     private AppDatabase mDb;
     private static final int IS_ID_PRESENT_IN_DATABASE = 1;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +37,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         mDb = AppDatabase.getInstance(getApplicationContext());
         final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
-        List<Movie> fabButtonToRed = mDb.movieDao().getfavourites();
         ActionBar actionBar = getSupportActionBar();
+
 
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -57,28 +62,47 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
 
-            for (Movie movie : fabButtonToRed) {
-                if (movie.getId().equals(mMovie.getId())) {
-                    myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
-                }
+            if (isAFavoriteMovie()) {
+                myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
             }
             getSupportActionBar().setTitle(mMovie.getTitle());
             myFab.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            int checkForFavouritesInDatabase = mDb.movieDao().loadAllFavourites(mMovie.getId());
-                            if (!(checkForFavouritesInDatabase == IS_ID_PRESENT_IN_DATABASE)) {
-                                mDb.movieDao().insertMovie(mMovie);
-                            }
-                        }
-                    });
-                    myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
+                    if (insertAndDeleteFavouriteMovie()) {
+                        myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like_white));
+                    } else {
+                        myFab.setImageDrawable(ContextCompat.getDrawable(MovieDetailActivity.this, R.drawable.ic_like));
+                    }
                 }
             });
         }
     }
+
+    private boolean isAFavoriteMovie() {
+        return mDb.movieDao().loadAllFavourites(mMovie.getId()) == IS_ID_PRESENT_IN_DATABASE;
+    }
+
+    public boolean insertAndDeleteFavouriteMovie() {
+        if (isAFavoriteMovie()) {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.movieDao().deleteMovie(mMovie);
+                }
+            });
+            return true;
+        } else {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.movieDao().insertMovie(mMovie);
+                }
+            });
+        }
+        return false;
+    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
