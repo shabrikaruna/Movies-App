@@ -53,6 +53,10 @@ public class MovieListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
 
+        if (savedInstanceState != null) {
+            flag = savedInstanceState.getInt("FLAG");
+        }
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -67,9 +71,11 @@ public class MovieListActivity extends AppCompatActivity {
         refreshPage.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                pageIncrement = 1;
-                mAdapter.clearData();
-                getMovies();
+                if (flag != 3) {
+                    pageIncrement = 1;
+                    mAdapter.clearData();
+                    apiRequest(flag);
+                }
                 refreshPage.setRefreshing(false);
             }
         });
@@ -86,18 +92,21 @@ public class MovieListActivity extends AppCompatActivity {
         EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-
-                if (id == R.id.popular) {
+                if (flag != 3) {
                     pageIncrement++;
-                    getPopularMovies();
-                } else if (id == R.id.toprated) {
-                    pageIncrement++;
-                    getTopRatedMovies();
+                    apiRequest(flag);
                 }
             }
+
         };
         recyclerView.addOnScrollListener(scrollListener);
         setUpViewModels(flag);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("FLAG", flag);
+        super.onSaveInstanceState(outState);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -112,6 +121,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 mAdapter.setMovieList(movies);
+                loadInitialMovie(movies.get(0));
             }
         });
     }
@@ -122,6 +132,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 mAdapter.setMovieList(movies);
+                loadInitialMovie(movies.get(0));
             }
         });
     }
@@ -131,33 +142,29 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                mAdapter.clearData();
-                mAdapter.setMovieList(movies);
+                if (movies != null && movies.size() > 0) {
+                    mAdapter.setMovieList(movies);
+                    loadInitialMovie(movies.get(0));
+                }
             }
         });
     }
 
-    public void getMovies() {
-        switch (id) {
-            case R.id.popular:
-                flag = 1;
-                mAdapter.clearData();
-                getPopularMovies();
-                break;
-            case R.id.toprated:
-                flag = 2;
-                mAdapter.clearData();
-                getTopRatedMovies();
-                break;
-            case R.id.favorites:
-                flag = 3;
-                mAdapter.clearData();
-                setupViewModelForFavoriteMovies();
-                break;
+    private void loadInitialMovie(Movie movie) {
+        if (mTwoPane && movie != null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(MOVIE_KEY, movie);
+            MovieDetailFragment fragment = new MovieDetailFragment();
+            fragment.setArguments(arguments);
+            this.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment)
+                    .commit();
         }
     }
 
+
     public void setUpViewModels(int flag) {
+
         switch (flag) {
             case 1:
                 setupViewModelForPopularMovies();
@@ -172,6 +179,7 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private void getPopularMovies() {
+
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, pageIncrement);
         call.enqueue(new retrofit2.Callback<MoviesResponse>() {
@@ -181,6 +189,7 @@ public class MovieListActivity extends AppCompatActivity {
                 List<Movie> list = response.body().getResults();
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
+                loadInitialMovie(list.get(0));
             }
 
             @Override
@@ -199,6 +208,7 @@ public class MovieListActivity extends AppCompatActivity {
                 List<Movie> list = response.body().getResults();
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
+                loadInitialMovie(list.get(0));
             }
 
             @Override
@@ -214,31 +224,46 @@ public class MovieListActivity extends AppCompatActivity {
         return true;
     }
 
+
+    private void apiRequest(int flag) {
+        switch (flag) {
+            case 1:
+                getPopularMovies();
+                break;
+            case 2:
+                getTopRatedMovies();
+                break;
+        }
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        id = item.getItemId();
+        int id = item.getItemId();
         pageIncrement = 1;
         mAdapter.clearData();
         switch (id) {
             case R.id.popular:
                 flag = 1;
-                getMovies();
+                apiRequest(flag);
                 getSupportActionBar().setTitle(R.string.popular);
-                return true;
+                break;
+
             case R.id.toprated:
                 flag = 2;
-                getMovies();
+                apiRequest(flag);
                 getSupportActionBar().setTitle(R.string.top_rated);
-                return true;
+                break;
+
             case R.id.favorites:
                 flag = 3;
                 setupViewModelForFavoriteMovies();
                 getSupportActionBar().setTitle(R.string.favorites);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
+
+        return super.onOptionsItemSelected(item);
     }
+
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
@@ -303,6 +328,7 @@ public class MovieListActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Movie movie = mMovieList.get(position);
                     if (mTwoPane) {
+
                         Bundle arguments = new Bundle();
                         arguments.putParcelable(MOVIE_KEY, movie);
                         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -311,6 +337,7 @@ public class MovieListActivity extends AppCompatActivity {
                                 .replace(R.id.movie_detail_container, fragment)
                                 .commit();
                     } else {
+
                         Context context = view.getContext();
                         Bundle arguments = new Bundle();
                         arguments.putParcelable(MOVIE_KEY, movie);
@@ -329,6 +356,7 @@ public class MovieListActivity extends AppCompatActivity {
                 notifyDataSetChanged();
             } else {
                 mMovieList.addAll(movieList);
+                notifyDataSetChanged();
                 notifyItemRangeInserted(mMovieList.size() - movieList.size(), mMovieList.size());
             }
         }

@@ -19,7 +19,7 @@ public interface MovieDao {
     void deleteMovie(Movie movie);
 
     @Query("SELECT * FROM movie")
-    LiveData<List<Movie>> getFavourites();
+    List<Movie> getFavourites();
 
     @Query("SELECT COUNT(*) FROM movie WHERE id = :id")
     int loadAllFavourites(int id);

@@ -25,6 +25,7 @@
             app:toolbarId="@+id/toolbar">
 
             <ImageView
+                android:foreground="@drawable/gradient"
                 android:id="@+id/image_view_backdrop"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

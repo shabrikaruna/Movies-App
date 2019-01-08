@@ -2,11 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="220dp"
         android:orientation="horizontal"
         android:weightSum="4">
 
@@ -38,24 +39,12 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/text_view_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/padding_8dp"
-                    android:paddingTop="@dimen/padding_8dp"
-                    android:paddingRight="@dimen/padding_8dp"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textsize_20sp"
-                    android:textStyle="bold"
-                    tools:text="Title" />
-
-                <TextView
                     android:id="@+id/text_view_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingLeft="@dimen/padding_8dp"
+                    android:paddingTop="@dimen/padding_16dp"
                     android:textColor="@android:color/black"
                     tools:text="Rating" />
 
@@ -77,6 +66,16 @@
                     android:textColor="@android:color/black"
                     tools:text="Release Date" />
 
+                <TextView
+                    android:id="@+id/text_view_language"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/padding_8dp"
+                    android:textColor="@android:color/black"
+                    tools:text="Release Date" />
+
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -85,24 +84,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="@dimen/padding_8dp">
+        android:paddingLeft="@dimen/padding_16dp"
+        android:paddingRight="@dimen/padding_8dp">
 
         <TextView
             android:id="@+id/text_view_plot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="3"
-            android:paddingLeft="@dimen/padding_16dp"
             android:textSize="@dimen/textsize_16sp"
             tools:text="Plot" />
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/youtube_button"
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/movie_list_trailers"
+        android:name="com.example.android.movie.MovieListFragment"
         android:layout_width="wrap_content"
-        android:layout_gravity="center"
         android:layout_height="wrap_content"
-        android:text="Play Video" />
+        android:paddingRight="@dimen/padding_16dp"
+        android:paddingLeft="@dimen/padding_16dp"
+        android:paddingTop="@dimen/padding_16dp" />
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/movie_list_review"
+        android:name="com.example.android.movie.MovieListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_16dp" />
 
 </LinearLayout>
