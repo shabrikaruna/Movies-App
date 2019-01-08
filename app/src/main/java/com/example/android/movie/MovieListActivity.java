@@ -1,9 +1,12 @@
 package com.example.android.movie;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -35,7 +38,7 @@ public class MovieListActivity extends AppCompatActivity {
     public static int id = R.id.popular;
     private GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
     private ProgressBar progressBar;
-    private int page = 1;
+    public static int pageIncrement = 1;
     private boolean mTwoPane;
     private AppDatabase mDb;
     private RecyclerView recyclerView;
@@ -43,6 +46,7 @@ public class MovieListActivity extends AppCompatActivity {
     private ImageView mNoInternetImageView;
     private SwipeRefreshLayout refreshPage;
     private boolean doNotChangeThePage = true;
+    private int flag = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +57,7 @@ public class MovieListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         progressBar = findViewById(R.id.progressbar);
-        progressBar.setVisibility(View.VISIBLE);
+
         getSupportActionBar().setTitle(R.string.popular);
         mNoInternetImageView = findViewById(R.id.no_internet_image);
 
@@ -63,8 +67,9 @@ public class MovieListActivity extends AppCompatActivity {
         refreshPage.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                page = 1;
+                pageIncrement = 1;
                 getMovies();
+                mAdapter.clearData();
                 refreshPage.setRefreshing(false);
             }
         });
@@ -77,15 +82,16 @@ public class MovieListActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.movie_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
-        getMovies();
 
         EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                getMovies();
+                    pageIncrement++;
+                    getMovies();
             }
         };
         recyclerView.addOnScrollListener(scrollListener);
+        setUpViewModels(flag);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -94,43 +100,82 @@ public class MovieListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(gridLayoutManager);
     }
 
+    private void setupViewModelForPopularMovies() {
+        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        movieViewModel.loadPopularMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                mAdapter.setMovieList(movies);
+            }
+        });
+    }
+
+        private void setupViewModelForTopRatedMovied() {
+        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        movieViewModel.loadTopRatedMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                mAdapter.setMovieList(movies);
+            }
+        });
+    }
+
+    private void setupViewModelForFavoriteMovies() {
+        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        movieViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                mAdapter.setMovieList(movies);
+            }
+        });
+    }
+
     public void getMovies() {
         switch (id) {
             case R.id.popular:
+                flag = 1;
                 getPopularMovies();
                 break;
             case R.id.toprated:
+                flag = 2;
                 getTopRatedMovies();
                 break;
             case R.id.favorites:
-                getFavouriteMovies();
+                flag = 3;
+                mAdapter.clearData();
+                setupViewModelForFavoriteMovies();
                 break;
         }
     }
 
-    private void getFavouriteMovies() {
-        mAdapter.clearData();
-        List<Movie> favorites = mDb.movieDao().getFavourites();
-        mAdapter.setMovieList(favorites);
-        progressBar.setVisibility(View.INVISIBLE);
+    public void setUpViewModels(int flag) {
+        switch (flag) {
+            case 1:
+                setupViewModelForPopularMovies();
+                break;
+            case 2:
+                setupViewModelForTopRatedMovied();
+                break;
+            case 3:
+                setupViewModelForFavoriteMovies();
+                break;
+        }
     }
 
     private void getPopularMovies() {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, page++);
+        Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, pageIncrement);
         call.enqueue(new retrofit2.Callback<MoviesResponse>() {
 
             @Override
             public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                 List<Movie> list = response.body().getResults();
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
             }
 
             @Override
             public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                progressBar.setVisibility(View.INVISIBLE);
                 mNoInternetImageView.setVisibility(View.VISIBLE);
             }
         });
@@ -138,19 +183,17 @@ public class MovieListActivity extends AppCompatActivity {
 
     private void getTopRatedMovies() {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
-        Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY, page++);
+        Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY, pageIncrement);
         call.enqueue(new retrofit2.Callback<MoviesResponse>() {
             @Override
             public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                 List<Movie> list = response.body().getResults();
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
             }
 
             @Override
             public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                progressBar.setVisibility(View.INVISIBLE);
                 mNoInternetImageView.setVisibility(View.VISIBLE);
             }
         });
@@ -162,30 +205,26 @@ public class MovieListActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         id = item.getItemId();
         switch (id) {
             case R.id.toprated:
-                page = 1;
+                pageIncrement = 1;
                 getMovies();
-                progressBar.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.top_rated);
                 mAdapter.clearData();
                 return true;
             case R.id.popular:
-                page = 1;
+                pageIncrement = 1;
                 getMovies();
-                progressBar.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.popular);
                 mAdapter.clearData();
                 return true;
             case R.id.favorites:
                 mAdapter.clearData();
-                progressBar.setVisibility(View.VISIBLE);
+                setupViewModelForFavoriteMovies();
                 getSupportActionBar().setTitle(R.string.favorites);
-                getMovies();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
