@@ -68,8 +68,8 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 pageIncrement = 1;
-                getMovies();
                 mAdapter.clearData();
+                getMovies();
                 refreshPage.setRefreshing(false);
             }
         });
@@ -86,8 +86,14 @@ public class MovieListActivity extends AppCompatActivity {
         EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                if (id == R.id.popular) {
                     pageIncrement++;
-                    getMovies();
+                    getPopularMovies();
+                } else if (id == R.id.toprated) {
+                    pageIncrement++;
+                    getTopRatedMovies();
+                }
             }
         };
         recyclerView.addOnScrollListener(scrollListener);
@@ -110,7 +116,7 @@ public class MovieListActivity extends AppCompatActivity {
         });
     }
 
-        private void setupViewModelForTopRatedMovied() {
+    private void setupViewModelForTopRatedMovies() {
         MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
         movieViewModel.loadTopRatedMovies().observe(this, new Observer<List<Movie>>() {
             @Override
@@ -125,6 +131,7 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
+                mAdapter.clearData();
                 mAdapter.setMovieList(movies);
             }
         });
@@ -134,10 +141,12 @@ public class MovieListActivity extends AppCompatActivity {
         switch (id) {
             case R.id.popular:
                 flag = 1;
+                mAdapter.clearData();
                 getPopularMovies();
                 break;
             case R.id.toprated:
                 flag = 2;
+                mAdapter.clearData();
                 getTopRatedMovies();
                 break;
             case R.id.favorites:
@@ -154,7 +163,7 @@ public class MovieListActivity extends AppCompatActivity {
                 setupViewModelForPopularMovies();
                 break;
             case 2:
-                setupViewModelForTopRatedMovied();
+                setupViewModelForTopRatedMovies();
                 break;
             case 3:
                 setupViewModelForFavoriteMovies();
@@ -208,21 +217,21 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         id = item.getItemId();
+        pageIncrement = 1;
+        mAdapter.clearData();
         switch (id) {
-            case R.id.toprated:
-                pageIncrement = 1;
-                getMovies();
-                getSupportActionBar().setTitle(R.string.top_rated);
-                mAdapter.clearData();
-                return true;
             case R.id.popular:
-                pageIncrement = 1;
+                flag = 1;
                 getMovies();
                 getSupportActionBar().setTitle(R.string.popular);
-                mAdapter.clearData();
+                return true;
+            case R.id.toprated:
+                flag = 2;
+                getMovies();
+                getSupportActionBar().setTitle(R.string.top_rated);
                 return true;
             case R.id.favorites:
-                mAdapter.clearData();
+                flag = 3;
                 setupViewModelForFavoriteMovies();
                 getSupportActionBar().setTitle(R.string.favorites);
                 return true;

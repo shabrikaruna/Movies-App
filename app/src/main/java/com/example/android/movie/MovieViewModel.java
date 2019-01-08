@@ -18,6 +18,7 @@ import static com.example.android.movie.MovieListActivity.pageIncrement;
 public class MovieViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Movie>> moviesViewModel;
+    private LiveData<List<Movie>> moviefavourites;
     private AppDatabase mDb;
 
     public MovieViewModel(@NonNull Application application) {
@@ -43,9 +44,12 @@ public class MovieViewModel extends AndroidViewModel {
 
     public LiveData<List<Movie>> getFavouriteMovies() {
         mDb = AppDatabase.getInstance(this.getApplication());
-        moviesViewModel = new MutableLiveData<>();
-        moviesViewModel.setValue(mDb.movieDao().getFavourites());
-        return moviesViewModel;
+        if(moviefavourites == null) {
+            moviefavourites = new MutableLiveData<>();
+            moviefavourites = mDb.movieDao().getFavourites();
+            return moviefavourites;
+        }
+        return moviefavourites;
     }
 
     private void getPopularMovies() {

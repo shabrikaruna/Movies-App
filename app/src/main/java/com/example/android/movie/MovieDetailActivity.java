@@ -26,7 +26,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     Movie mMovie;
     private AppDatabase mDb;
     private static final int IS_ID_PRESENT_IN_DATABASE = 1;
-    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +100,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
         return false;
     }
-
 
 
     @Override
