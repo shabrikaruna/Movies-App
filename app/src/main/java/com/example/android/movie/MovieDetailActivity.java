@@ -14,13 +14,22 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.example.android.movie.database.AppDatabase;
+import com.example.android.movie.database.MovieVideoKey;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
     Movie mMovie;
     private AppDatabase mDb;
     private static final int IS_ID_PRESENT_IN_DATABASE = 1;
+    List<Result> mMovieVideoKey;
+    private String video_key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +79,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 }
             });
         }
+        getVideoKey();
     }
 
     private boolean isAFavoriteMovie() {
@@ -96,6 +106,23 @@ public class MovieDetailActivity extends AppCompatActivity {
         return false;
     }
 
+    private void getVideoKey() {
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<MovieVideoKey> call = apiService.getMovieVideo(mMovie.getId(), MovieListActivity.API_KEY);
+        call.enqueue(new Callback<MovieVideoKey>() {
+            @Override
+            public void onResponse(Call<MovieVideoKey> call, Response<MovieVideoKey> response) {
+                mMovieVideoKey = response.body().getResults();
+                video_key = mMovieVideoKey.get(0).getKey();
+            }
+
+            @Override
+            public void onFailure(Call<MovieVideoKey> call, Throwable t) {
+
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -112,7 +139,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         } else if(id == R.id.menu_item_share){
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
-            String shareBody = "sharing trialer of " + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL;
+            String shareBody = "sharing trialer of " + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + video_key;
             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
             startActivity(Intent.createChooser(sharingIntent, "Share via"));
