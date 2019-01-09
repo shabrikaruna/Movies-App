@@ -18,7 +18,7 @@
         android:id="@+id/tv_review_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
+        android:paddingLeft="@dimen/padding_8dp"
         tools:text="Content" />
 
 </LinearLayout>

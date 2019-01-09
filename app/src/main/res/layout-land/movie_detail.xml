@@ -78,7 +78,6 @@
                         android:textColor="@android:color/black"
                         tools:text="Release Date" />
 
-
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

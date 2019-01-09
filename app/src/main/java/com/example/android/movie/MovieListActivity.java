@@ -53,25 +53,37 @@ public class MovieListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
 
-        if (savedInstanceState != null) {
-            flag = savedInstanceState.getInt("FLAG");
-        }
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        progressBar = findViewById(R.id.progressbar);
 
+        if (savedInstanceState != null) {
+            flag = savedInstanceState.getInt("FLAG");
+            id = savedInstanceState.getInt("ITEM_NAME");
+
+            if (id == R.id.favorites) {
+                getSupportActionBar().setTitle(getResources().getString(R.string.favorites));
+            } else if (id == R.id.popular) {
+                getSupportActionBar().setTitle(getResources().getString(R.string.popular));
+            } else {
+                getSupportActionBar().setTitle(getResources().getString(R.string.top_rated));
+            }
+        }
+
+        progressBar = findViewById(R.id.progressbar);
         getSupportActionBar().setTitle(R.string.popular);
         mNoInternetImageView = findViewById(R.id.no_internet_image);
 
         mNoInternetImageView.setVisibility(View.INVISIBLE);
         refreshPage = findViewById(R.id.pullToRefresh);
 
+        progressBar.setVisibility(View.VISIBLE);
+
         refreshPage.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if (flag != 3) {
+                    progressBar.setVisibility(View.VISIBLE);
                     pageIncrement = 1;
                     mAdapter.clearData();
                     apiRequest(flag);
@@ -97,7 +109,6 @@ public class MovieListActivity extends AppCompatActivity {
                     apiRequest(flag);
                 }
             }
-
         };
         recyclerView.addOnScrollListener(scrollListener);
         setUpViewModels(flag);
@@ -106,6 +117,7 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("FLAG", flag);
+        outState.putInt("ITEM_NAME", id);
         super.onSaveInstanceState(outState);
     }
 
@@ -120,6 +132,7 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.loadPopularMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
+                progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
                 loadInitialMovie(movies.get(0));
             }
@@ -131,6 +144,7 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.loadTopRatedMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
+                progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
                 loadInitialMovie(movies.get(0));
             }
@@ -142,7 +156,9 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                if (movies != null && movies.size() > 0) {
+                if (flag == 3) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    mAdapter.clearData();
                     mAdapter.setMovieList(movies);
                     loadInitialMovie(movies.get(0));
                 }
@@ -162,7 +178,6 @@ public class MovieListActivity extends AppCompatActivity {
         }
     }
 
-
     public void setUpViewModels(int flag) {
 
         switch (flag) {
@@ -179,7 +194,6 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private void getPopularMovies() {
-
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY, pageIncrement);
         call.enqueue(new retrofit2.Callback<MoviesResponse>() {
@@ -187,6 +201,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                 List<Movie> list = response.body().getResults();
+                progressBar.setVisibility(View.INVISIBLE);
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
                 loadInitialMovie(list.get(0));
@@ -206,6 +221,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
                 List<Movie> list = response.body().getResults();
+                progressBar.setVisibility(View.INVISIBLE);
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(list);
                 loadInitialMovie(list.get(0));
@@ -224,7 +240,6 @@ public class MovieListActivity extends AppCompatActivity {
         return true;
     }
 
-
     private void apiRequest(int flag) {
         switch (flag) {
             case 1:
@@ -236,7 +251,6 @@ public class MovieListActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -245,25 +259,24 @@ public class MovieListActivity extends AppCompatActivity {
         switch (id) {
             case R.id.popular:
                 flag = 1;
+                progressBar.setVisibility(View.VISIBLE);
                 apiRequest(flag);
                 getSupportActionBar().setTitle(R.string.popular);
                 break;
-
             case R.id.toprated:
                 flag = 2;
+                progressBar.setVisibility(View.VISIBLE);
                 apiRequest(flag);
                 getSupportActionBar().setTitle(R.string.top_rated);
                 break;
-
             case R.id.favorites:
                 flag = 3;
+                progressBar.setVisibility(View.VISIBLE);
                 setupViewModelForFavoriteMovies();
                 getSupportActionBar().setTitle(R.string.favorites);
         }
-
         return super.onOptionsItemSelected(item);
     }
-
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
@@ -315,20 +328,11 @@ public class MovieListActivity extends AppCompatActivity {
                         .commit();
             }
 
-            if (id == R.id.favorites) {
-                getSupportActionBar().setTitle(R.string.favorites);
-            } else if (MovieListActivity.id == R.id.popular) {
-                getSupportActionBar().setTitle(R.string.popular);
-            } else {
-                getSupportActionBar().setTitle(R.string.top_rated);
-            }
-
             final View.OnClickListener mOnClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Movie movie = mMovieList.get(position);
                     if (mTwoPane) {
-
                         Bundle arguments = new Bundle();
                         arguments.putParcelable(MOVIE_KEY, movie);
                         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -337,7 +341,6 @@ public class MovieListActivity extends AppCompatActivity {
                                 .replace(R.id.movie_detail_container, fragment)
                                 .commit();
                     } else {
-
                         Context context = view.getContext();
                         Bundle arguments = new Bundle();
                         arguments.putParcelable(MOVIE_KEY, movie);
@@ -373,7 +376,6 @@ public class MovieListActivity extends AppCompatActivity {
                 super(view);
                 imageView = itemView.findViewById(R.id.imageView);
             }
-
         }
     }
 }

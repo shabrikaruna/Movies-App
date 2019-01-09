@@ -9,9 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -63,24 +60,6 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
         getVideoKey();
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater.inflate(R.menu.sharemenu, menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-//        sharingIntent.setType("text/plain");
-//        String shareBody = "sharing trialer of " + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + mMovieVideoKey.get(0).getKey();
-//        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
-//        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-//        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-//        return true;
-//    }
-
     private void getVideoKey() {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<MovieVideoKey> call = apiService.getMovieVideo(mMovie.getId(), MovieListActivity.API_KEY);
@@ -98,7 +77,6 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
         });
     }
 
-
     private void getReviews() {
         ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
         Call<MovieReviewResponse> call = apiService.getMovieReviews(mMovie.getId(), MovieListActivity.API_KEY);
@@ -115,7 +93,6 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
             }
         });
     }
-
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
@@ -144,12 +121,14 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
         movieReviewAdapter = new MovieReviewAdapter(getActivity());
         mRecyclerViewReviews.setAdapter(movieReviewAdapter);
         mRecyclerViewReviews.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerViewReviews.setNestedScrollingEnabled(false);
     }
 
     private void setupRecyclerViewForTrailers() {
         movieTrailerAdapter = new MovieTrailerAdapter(getActivity(), this);
         mRecyclerViewTrailers.setAdapter(movieTrailerAdapter);
-        mRecyclerViewTrailers.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        mRecyclerViewTrailers.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerViewTrailers.setNestedScrollingEnabled(false);
     }
 
     private void initViews(View rootView) {

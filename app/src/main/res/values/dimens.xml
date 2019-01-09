@@ -5,7 +5,10 @@
     <dimen name="textsize_16sp">16sp</dimen>
     <dimen name="textsize_20sp">20sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="app_bar_height">300dp</dimen>
+    <dimen name="app_bar_height">250dp</dimen>
     <dimen name="item_width">300dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="width_0dp">0dp</dimen>
+    <dimen name="linear_layout_height">200dp</dimen>
+    <dimen name="linear_layout_height_container">220dp</dimen>
 </resources>
