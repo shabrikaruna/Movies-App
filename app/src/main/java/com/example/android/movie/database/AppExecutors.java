@@ -1,12 +1,14 @@
-package com.example.android.movie;
+package com.example.android.movie.database;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class AppExecutors {
+
     private static final Object LOCK = new Object();
     private static AppExecutors sInstance;
     private final Executor diskIO;

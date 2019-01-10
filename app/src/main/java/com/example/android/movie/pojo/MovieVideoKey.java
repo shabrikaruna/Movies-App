@@ -1,6 +1,5 @@
-package com.example.android.movie.database;
+package com.example.android.movie.pojo;
 
-import com.example.android.movie.Result;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -24,7 +23,7 @@ public class MovieVideoKey {
     }
 
     public List<Result> getResults() {
-        return results.size() > 0 ? results : null;
+        return results;
     }
 
     public void setResults(List<Result> results) {

@@ -7,15 +7,20 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.android.movie.adapters.MovieTrailerAdapter;
+import com.example.android.movie.api_utils.ApiClient;
+import com.example.android.movie.api_utils.ApiInterface;
 import com.example.android.movie.database.AppDatabase;
-import com.example.android.movie.database.MovieVideoKey;
+import com.example.android.movie.database.AppExecutors;
+import com.example.android.movie.pojo.Movie;
+import com.example.android.movie.pojo.MovieVideoKey;
+import com.example.android.movie.pojo.Result;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -30,22 +35,20 @@ public class MovieDetailActivity extends AppCompatActivity {
     private AppDatabase mDb;
     private static final int IS_ID_PRESENT_IN_DATABASE = 1;
     List<Result> mMovieVideoKey;
-    private String video_key;
-    private static final String TAG = MovieDetailActivity.class.getSimpleName();
-
+    private String video_key = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
-        setSupportActionBar(toolbar);
+
         mDb = AppDatabase.getInstance(getApplicationContext());
         final FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
+        Bundle arguments;
 
-        Bundle arguments = new Bundle();
         arguments = getIntent().getBundleExtra(MovieListActivity.MOVIE_KEY_INTENT);
         mMovie = arguments.getParcelable(MovieListActivity.MOVIE_KEY);
 
@@ -116,12 +119,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         call.enqueue(new Callback<MovieVideoKey>() {
             @Override
             public void onResponse(Call<MovieVideoKey> call, Response<MovieVideoKey> response) {
-
-                Log.d(TAG, "Movie id : " + mMovie.getId());
-                if (response.body().getResults() != null) {
+                if (response.body().getResults().size() != 0) {
+                    mMovieVideoKey = response.body().getResults();
                     video_key = mMovieVideoKey.get(0).getKey();
-                } else {
-                    video_key = "";
                 }
             }
 
@@ -146,19 +146,19 @@ public class MovieDetailActivity extends AppCompatActivity {
             finish();
             return true;
         } else if (id == R.id.menu_item_share) {
-            if (video_key.length() > 0) {
+            if (video_key.equals("")) {
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = getString(R.string.sharing_trailer_of) + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + video_key;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
+                String shareBody = getString(R.string.sharing_plot_and_title) + mMovie.getTitle() + "\n" + mMovie.getDescription();
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "movie_name");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
                 return true;
             } else {
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                String shareBody = getString(R.string.sharing_plot_and_title) + mMovie.getTitle() + "\n" + mMovie.getDescription();
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "movie_name");
+                String shareBody = getString(R.string.sharing_trailer_of) + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + video_key;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
                 return true;

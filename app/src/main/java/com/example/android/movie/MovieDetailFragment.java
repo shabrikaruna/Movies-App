@@ -14,7 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.movie.database.MovieVideoKey;
+import com.example.android.movie.adapters.MovieReviewAdapter;
+import com.example.android.movie.adapters.MovieTrailerAdapter;
+import com.example.android.movie.api_utils.ApiClient;
+import com.example.android.movie.api_utils.ApiInterface;
+import com.example.android.movie.pojo.Movie;
+import com.example.android.movie.pojo.MovieReview;
+import com.example.android.movie.pojo.MovieReviewResponse;
+import com.example.android.movie.pojo.MovieVideoKey;
+import com.example.android.movie.pojo.Result;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

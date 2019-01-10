@@ -1,5 +1,6 @@
-package com.example.android.movie;
+package com.example.android.movie.pojo;
 
+import com.example.android.movie.pojo.Movie;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

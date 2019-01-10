@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -6,7 +6,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
+import com.example.android.movie.api_utils.ApiClient;
+import com.example.android.movie.api_utils.ApiInterface;
 import com.example.android.movie.database.AppDatabase;
+import com.example.android.movie.pojo.Movie;
+import com.example.android.movie.pojo.MoviesResponse;
 
 import java.util.List;
 
@@ -19,7 +23,6 @@ public class MovieViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Movie>> moviesViewModel;
     private LiveData<List<Movie>> movieFavourites;
-    private AppDatabase mDb;
 
     public MovieViewModel(@NonNull Application application) {
         super(application);
@@ -42,7 +45,7 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Movie>> getFavouriteMovies() {
-        mDb = AppDatabase.getInstance(this.getApplication());
+        AppDatabase mDb = AppDatabase.getInstance(this.getApplication());
         movieFavourites = new MutableLiveData<>();
         movieFavourites = mDb.movieDao().getFavourites();
         return movieFavourites;

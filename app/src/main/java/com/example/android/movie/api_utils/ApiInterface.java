@@ -1,6 +1,8 @@
-package com.example.android.movie;
+package com.example.android.movie.api_utils;
 
-import com.example.android.movie.database.MovieVideoKey;
+import com.example.android.movie.pojo.MovieReviewResponse;
+import com.example.android.movie.pojo.MoviesResponse;
+import com.example.android.movie.pojo.MovieVideoKey;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

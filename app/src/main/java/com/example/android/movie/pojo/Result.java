@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.pojo;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

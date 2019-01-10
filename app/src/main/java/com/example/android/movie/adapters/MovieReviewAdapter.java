@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,6 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.android.movie.R;
+import com.example.android.movie.pojo.MovieReview;
+
 import java.util.List;
 
 public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.MovieReviewViewHolder> {
@@ -42,7 +46,7 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<MovieReviewAdapter.
         return mMovieReviews == null ? 0 : mMovieReviews.size();
     }
 
-    public class MovieReviewViewHolder extends RecyclerView.ViewHolder{
+    public class MovieReviewViewHolder extends RecyclerView.ViewHolder {
 
         TextView author;
         TextView content;

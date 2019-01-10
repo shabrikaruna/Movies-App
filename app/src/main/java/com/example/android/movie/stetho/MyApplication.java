@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.stetho;
 
 import android.app.Application;
 

@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.endlessRecyclerView;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

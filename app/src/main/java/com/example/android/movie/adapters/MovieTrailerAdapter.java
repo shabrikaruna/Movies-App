@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.movie.R;
+import com.example.android.movie.pojo.Result;
+
 import java.util.List;
 
 public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerAdapter.MovieTrailerViewHolder> {
@@ -16,7 +19,6 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerAdapte
     private List<Result> mMovieTrailerUrl;
     public static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
     final private ItemClickListener mItemClickListener;
-
 
     public MovieTrailerAdapter(Context mContext, ItemClickListener listener) {
         this.mContext = mContext;

@@ -1,4 +1,4 @@
-package com.example.android.movie;
+package com.example.android.movie.api_utils;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
