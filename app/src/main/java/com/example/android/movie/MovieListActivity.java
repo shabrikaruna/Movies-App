@@ -63,6 +63,7 @@ public class MovieListActivity extends AppCompatActivity {
     private int flag = CATEGORY_POPULAR;
     public static int pageIncrement = 1;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,12 +145,12 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private void setupViewModelForPopularMovies() {
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
         movieViewModel.loadPopularMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
-                assert movies != null;
                 loadInitialMovie(movies.get(0));
             }
         });
@@ -161,7 +162,6 @@ public class MovieListActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Movie> movies) {
                 progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
-                assert movies != null;
                 loadInitialMovie(movies.get(0));
             }
         });
@@ -172,13 +172,11 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 progressBar.setVisibility(View.INVISIBLE);
-                assert movies != null;
+                mAdapter.clearData();
                 if (flag == CATEGORY_FAVOURITES && movies.size() > 0) {
-                    mAdapter.clearData();
                     mAdapter.setMovieList(movies);
                     loadInitialMovie(movies.get(0));
                 } else if (flag == CATEGORY_FAVOURITES) {
-                    mAdapter.clearData();
                     Snackbar.make(coordinatorLayout, "No Favourites", Snackbar.LENGTH_LONG).show();
                 }
             }

@@ -58,7 +58,6 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
             Bundle arguments = getArguments();
             mMovie = arguments.getParcelable(MovieListActivity.MOVIE_KEY);
         }
-
         getReviews();
         getVideoKey();
     }
