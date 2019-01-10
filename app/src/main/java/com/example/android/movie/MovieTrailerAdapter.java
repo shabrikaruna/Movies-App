@@ -26,7 +26,6 @@ public class MovieTrailerAdapter extends RecyclerView.Adapter<MovieTrailerAdapte
     @NonNull
     @Override
     public MovieTrailerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-
         View view = LayoutInflater.from(mContext).inflate(R.layout.trailer_list, viewGroup, false);
         return new MovieTrailerViewHolder(view);
     }

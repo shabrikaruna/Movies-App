@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.android.movie.database.AppDatabase;
 import com.squareup.picasso.Picasso;
@@ -35,18 +38,21 @@ public class MovieListActivity extends AppCompatActivity {
     public static final String TMDB_IMAGE_PATH_BACKDROP = "http://image.tmdb.org/t/p/w780";
     private static final int NUMBER_OF_COLUMNS = 2;
     public final static String API_KEY = "d557ce13bede53617fbb431b9de5791e";
-    public static int id = R.id.popular;
+
     private GridLayoutManager gridLayoutManager = new GridLayoutManager(MovieListActivity.this, NUMBER_OF_COLUMNS);
     private ProgressBar progressBar;
-    public static int pageIncrement = 1;
     private boolean mTwoPane;
     private AppDatabase mDb;
     private RecyclerView recyclerView;
     private SimpleItemRecyclerViewAdapter mAdapter;
     private ImageView mNoInternetImageView;
     private SwipeRefreshLayout refreshPage;
+    private CoordinatorLayout coordinatorLayout;
+
+    public static int id = R.id.popular;
     private boolean doNotChangeThePage = true;
     private int flag = 1;
+    public static int pageIncrement = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +79,7 @@ public class MovieListActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressbar);
         getSupportActionBar().setTitle(R.string.popular);
         mNoInternetImageView = findViewById(R.id.no_internet_image);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_coordinator);
 
         mNoInternetImageView.setVisibility(View.INVISIBLE);
         refreshPage = findViewById(R.id.pullToRefresh);
@@ -134,6 +141,7 @@ public class MovieListActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Movie> movies) {
                 progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
+                assert movies != null;
                 loadInitialMovie(movies.get(0));
             }
         });
@@ -146,6 +154,7 @@ public class MovieListActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Movie> movies) {
                 progressBar.setVisibility(View.INVISIBLE);
                 mAdapter.setMovieList(movies);
+                assert movies != null;
                 loadInitialMovie(movies.get(0));
             }
         });
@@ -156,11 +165,15 @@ public class MovieListActivity extends AppCompatActivity {
         movieViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                if (flag == 3) {
-                    progressBar.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                assert movies != null;
+                if (flag == 3 && movies.size() > 0) {
                     mAdapter.clearData();
                     mAdapter.setMovieList(movies);
                     loadInitialMovie(movies.get(0));
+                } else if(flag == 3){
+                    mAdapter.clearData();
+                    Snackbar.make(coordinatorLayout, "No Favourites", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -179,7 +192,6 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     public void setUpViewModels(int flag) {
-
         switch (flag) {
             case 1:
                 setupViewModelForPopularMovies();
@@ -210,6 +222,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MoviesResponse> call, Throwable t) {
                 mNoInternetImageView.setVisibility(View.VISIBLE);
+                t.printStackTrace();
             }
         });
     }
@@ -220,9 +233,10 @@ public class MovieListActivity extends AppCompatActivity {
         call.enqueue(new retrofit2.Callback<MoviesResponse>() {
             @Override
             public void onResponse(Call<MoviesResponse> call, retrofit2.Response<MoviesResponse> response) {
-                List<Movie> list = response.body().getResults();
                 progressBar.setVisibility(View.INVISIBLE);
                 mNoInternetImageView.setVisibility(View.INVISIBLE);
+
+                List<Movie> list = response.body().getResults();
                 mAdapter.setMovieList(list);
                 loadInitialMovie(list.get(0));
             }
@@ -230,6 +244,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MoviesResponse> call, Throwable t) {
                 mNoInternetImageView.setVisibility(View.VISIBLE);
+                t.printStackTrace();
             }
         });
     }
@@ -257,12 +272,13 @@ public class MovieListActivity extends AppCompatActivity {
         pageIncrement = 1;
         mAdapter.clearData();
         switch (id) {
-            case R.id.popular:
+            case R.id.popular: {
                 flag = 1;
                 progressBar.setVisibility(View.VISIBLE);
                 apiRequest(flag);
                 getSupportActionBar().setTitle(R.string.popular);
-                break;
+                return true;
+            }
             case R.id.toprated:
                 flag = 2;
                 progressBar.setVisibility(View.VISIBLE);

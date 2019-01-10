@@ -13,4 +13,8 @@
     <string name="favorites">Favorites</string>
     <string name="rating_string">/ 10</string>
     <string name="share">Share</string>
+    <string name="sharing_trailer_of">Sharing trialer of</string>
+    <string name="sharing_plot_and_title">Sharing Movie Name and Plot</string>
+    <string name="share_via">Share via</string>
+    <string name="language">Language</string>
 </resources>

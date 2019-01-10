@@ -24,7 +24,7 @@ public class MovieVideoKey {
     }
 
     public List<Result> getResults() {
-        return results;
+        return results.size() > 0 ? results : null;
     }
 
     public void setResults(List<Result> results) {

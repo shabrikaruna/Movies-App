@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,24 +24,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter.ItemClickListener {
-    Movie mMovie;
+    private Movie mMovie;
     Activity activity = this.getActivity();
-    List<Result> mMovieVideoKey;
-    List<MovieReview> mMovieReviews;
-    private static final String TAG = "MovieDetailFragment";
+    private List<Result> mMovieVideoKey;
+    private List<MovieReview> mMovieReviews;
     private MovieReviewAdapter movieReviewAdapter;
     private MovieTrailerAdapter movieTrailerAdapter;
-    private TextView mTextViewReviewAuthor;
-    private TextView mTextViewReviewContent;
-    ImageView mImageViewPoster;
-    TextView mTextViewRating;
-    TextView mTextViewPlot;
-    TextView mTextViewVotes;
-    TextView mTextViewReleaseDate;
-    Button button;
-    TextView mTextViewLanguage;
-    RecyclerView mRecyclerViewReviews;
-    RecyclerView mRecyclerViewTrailers;
+    private ImageView mImageViewPoster;
+    private TextView mTextViewRating;
+    private TextView mTextViewPlot;
+    private TextView mTextViewVotes;
+    private TextView mTextViewReleaseDate;
+    private TextView mTextViewLanguage;
+    private RecyclerView mRecyclerViewReviews;
+    private RecyclerView mRecyclerViewTrailers;
 
     public MovieDetailFragment() {
     }
@@ -72,7 +67,7 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
 
             @Override
             public void onFailure(Call<MovieVideoKey> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
     }
@@ -89,7 +84,7 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
 
             @Override
             public void onFailure(Call<MovieReviewResponse> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
     }
@@ -113,7 +108,7 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
         mTextViewPlot.setText(mMovie.getDescription());
         mTextViewReleaseDate.setText(String.format("%s %s", getString(R.string.releaseDate), mMovie.getReleaseDate()));
         mTextViewVotes.setText(String.format("%s %d", getString(R.string.Votes), mMovie.getVoteCount()));
-        mTextViewLanguage.setText("Language " + mMovie.getOriginalLanguage());
+        mTextViewLanguage.setText(getString(R.string.language) + mMovie.getOriginalLanguage());
         return rootView;
     }
 
@@ -138,8 +133,6 @@ public class MovieDetailFragment extends Fragment implements MovieTrailerAdapter
         mTextViewPlot = rootView.findViewById(R.id.text_view_plot);
         mTextViewVotes = rootView.findViewById(R.id.text_view_votes);
         mTextViewReleaseDate = rootView.findViewById(R.id.text_view_release_date);
-        mTextViewReviewContent = rootView.findViewById(R.id.tv_review_content);
-        mTextViewReviewAuthor = rootView.findViewById(R.id.tv_review_author);
         mRecyclerViewReviews = rootView.findViewById(R.id.movie_list_review);
         mRecyclerViewTrailers = rootView.findViewById(R.id.movie_list_trailers);
     }

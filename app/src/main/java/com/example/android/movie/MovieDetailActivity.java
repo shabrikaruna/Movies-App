@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,7 +31,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final int IS_ID_PRESENT_IN_DATABASE = 1;
     List<Result> mMovieVideoKey;
     private String video_key;
-    Movie getmMovie;
+    private static final String TAG = MovieDetailActivity.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,13 +116,18 @@ public class MovieDetailActivity extends AppCompatActivity {
         call.enqueue(new Callback<MovieVideoKey>() {
             @Override
             public void onResponse(Call<MovieVideoKey> call, Response<MovieVideoKey> response) {
-                mMovieVideoKey = response.body().getResults();
-                video_key = mMovieVideoKey.get(0).getKey();
+
+                Log.d(TAG, "Movie id : " + mMovie.getId());
+                if (response.body().getResults() != null) {
+                    video_key = mMovieVideoKey.get(0).getKey();
+                } else {
+                    video_key = "";
+                }
             }
 
             @Override
             public void onFailure(Call<MovieVideoKey> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
     }
@@ -139,13 +146,23 @@ public class MovieDetailActivity extends AppCompatActivity {
             finish();
             return true;
         } else if (id == R.id.menu_item_share) {
-            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-            sharingIntent.setType("text/plain");
-            String shareBody = "Sharing trialer of " + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + video_key;
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
-            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-            startActivity(Intent.createChooser(sharingIntent, "Share via"));
-            return true;
+            if (video_key.length() > 0) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = getString(R.string.sharing_trailer_of) + mMovie.getTitle() + "\n" + MovieTrailerAdapter.YOUTUBE_BASE_URL + video_key;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "video_url");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
+                return true;
+            } else {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = getString(R.string.sharing_plot_and_title) + mMovie.getTitle() + "\n" + mMovie.getDescription();
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "movie_name");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

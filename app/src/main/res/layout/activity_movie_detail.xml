@@ -37,9 +37,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
         </android.support.design.widget.CollapsingToolbarLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
@@ -58,5 +56,4 @@
         app:backgroundTint="@android:color/white"
         app:layout_anchor="@+id/movie_detail_container"
         app:layout_anchorGravity="top|end" />
-
 </android.support.design.widget.CoordinatorLayout>
